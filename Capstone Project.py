@@ -42,7 +42,7 @@ def displayInventory(): # to display current inventory using prettytable
 def deleteParts():
     while True:
         try:
-            print('Delete menu')
+            print('\nDelete menu')
             print('1. Delete parts') 
             print('2. Return to main menu')
             choice = int(input('Enter desired function [1-2]: '))
@@ -80,15 +80,16 @@ def deleteParts():
                             continue
                 elif delete_by == 2:
                     confirmation = input("Are you sure you want to delete all data? (Y/N) ")
-                    if delete_by.upper() == 'Y':
+                    if confirmation.upper() == 'Y':
                         parts_stock.clear()
-                    elif delete_by.upper() == 'N':
+                    elif confirmation.upper() == 'N':
                         continue
                     else:
                         print('Invalid input.')
                         continue
                 elif delete_by == 3:
                     deleteZero()
+                    print('\nAll data has been deleted\n')
                 elif delete_by == 4:
                     continue
                 else:
@@ -108,7 +109,7 @@ def deleteZero():
     
 def add_parts(): # Add new parts to inventory 
     while True:
-        print('Add menu')
+        print('\nAdd menu')
         print('1. Add a part') 
         print('2. Return to main menu')
         try:
