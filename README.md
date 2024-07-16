@@ -10,5 +10,5 @@
 #### price: float. Is in USD
 ### Extra features:
 #### - Purchase history for warranty claim
-#### - Sort by a defined attribute
+#### - Sort by a defined attribute using bubble sort
 #### - Automatic ID of purchasing history
