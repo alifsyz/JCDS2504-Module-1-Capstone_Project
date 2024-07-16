@@ -23,7 +23,7 @@ parts_stock = [{'manufacturer_pn': 1700231, 'part_name': 'Lower Intake Boot', 'm
 
 cart = []
 transactions = [] # List of all transactions that has been done. Usually for records that can be useful to claim warranty
-admin_privelages = False
+# admin_privelages = False # WIP for admin privelages
 
 def displayInventory(): # to display current inventory using prettytable
     # deleteZero() # Remove parts that have zero stock so it does not show when displaying the inventory
@@ -46,12 +46,13 @@ def deleteParts():
             print('1. Delete parts') 
             print('2. Return to main menu')
             choice = int(input('Enter desired function [1-2]: '))
-
+        
             if choice == 1:
                 print('1. Delete by Part Number') 
                 print('2. Delete all inventory data')
-                print('3. Return to sub-menu')
-                delete_by = int(input('Enter a selection: '))
+                print('3. Delete parts with empty stock')
+                print('4. Return to sub menu')
+                delete_by = int(input('Enter a selection [1-4]: '))
                 if delete_by == 1:
                     delete_pn = (int(input('\nEnter part number to delete: ')))
                     result = findPartsByPN(delete_pn)
@@ -60,7 +61,7 @@ def deleteParts():
                             tables = PrettyTable()
                             tables.field_names = ['Manufacture P/N','Name','Brand','Compatibility', 'Quantity','Price ($)']
                             tables.add_row(([parts_stock[result]['manufacturer_pn'],parts_stock[result]['part_name'],parts_stock[result]['manufacturer_brand'],parts_stock[result]['part_compatibility'],
-                                parts_stock[result]['stock_quantity'],parts_stock[result]['price']])) #inserting list items into pretty table) #inserting list items into pretty table for diplaying 
+                                parts_stock[result]['stock_quantity'],parts_stock[result]['price']]))   # inserting list items into pretty table for diplaying 
                             tables.align = 'c'
                             print(tables)
                             confirmation = input('Are you sure you want to delete this part?(Y/N): ') 
@@ -86,6 +87,10 @@ def deleteParts():
                     else:
                         print('Invalid input.')
                         continue
+                elif delete_by == 3:
+                    deleteZero()
+                elif delete_by == 4:
+                    continue
                 else:
                     print('\nInvalid input.')
                     continue
@@ -95,7 +100,6 @@ def deleteParts():
                 print('\nPlease enter the correct menu.')
         except ValueError:
             print('\nPlease enter only integers.')
-    # displayInventory()
 
 def deleteZero():
     for i in range(len(parts_stock)):
@@ -113,7 +117,7 @@ def add_parts(): # Add new parts to inventory
                 try:
                     manufacturer_pn = int(input('Enter part number : '))
                     result = findPartsByPN(manufacturer_pn) # Checking for duplicate parts (by Part Number)
-                    int_check = isinstance(result,int)
+                    int_check = isinstance(result,int) # isinstance used to check type: 'int'
                     if int_check == True:
                         print('\nPart exists! Please enter a different Part Number\n')
                         continue                    
@@ -122,17 +126,17 @@ def add_parts(): # Add new parts to inventory
                     part_compatibility = input('Enter part compatibility: ')
                     while True:
                         stock_quantity = int(input('Enter quantity of parts : '))
-                        if stock_quantity < 0:
+                        if stock_quantity <= 0:
                             print('\nPlease enter the correct amount.')
                             continue
-                        elif stock_quantity.isdigit() == False:
+                        elif isinstance(stock_quantity,int) == False:
                             print('Please enter the correct amount.')
                             continue
                         else:
                             break
                     while True:
                         part_price = float(input('Please enter price: '))
-                        if part_price < 0:
+                        if part_price <= 0:
                             print('\nPlease enter the correct amount.')
                             break
                         elif stock_quantity.isfloat() == False:
@@ -169,7 +173,7 @@ def add_parts(): # Add new parts to inventory
         except ValueError:
             print('\nPlease enter an integer.')
 
-def bubbleSort(data,key): # Sort using bubble sort method
+def bubbleSort(data,key): # Sort using bubble sort method. data = list, key = key in the dictionary that wants to be sorted by
     n = len(data)
     for i in range(n):
         for j in range(0, n-i-1):
@@ -188,7 +192,7 @@ def viewParts(): # view current inventory list
             if choice == 1:
                 displayInventory()
                 print('1. Sort by Partnumber\n2. Sort by Name\n3. Sort by Compatibility\n4. Sort by Price\n5. Exit')
-                sort = int(input('Enter a selection: '))
+                sort = int(input('Enter a selection [1-5]: '))
                 if sort == 1: # Sorting is done by bubbleSort function in ascending order
                     bubbleSort(parts_stock,'manufacturer_pn')
                 elif sort == 2:
@@ -197,8 +201,7 @@ def viewParts(): # view current inventory list
                     bubbleSort(parts_stock,'part_compatibility')
                 elif sort == 4:
                     bubbleSort(parts_stock,'price')
-
-                continue
+                continue # will continue the loop when no input or any input other 1-4 is entered 
             if choice == 2:
                 p_number = int(input('Enter part number: '))
                 result = findPartsByPN(p_number)
@@ -211,14 +214,6 @@ def viewParts(): # view current inventory list
                                     parts_stock[result]['stock_quantity'],parts_stock[result]['price']]) #inserting list items into pretty table
                     tables.align = 'c' #align center
                     print(tables)
-                    # check = input('Would you like to return to the main menu? (Y/N): ')
-                    # if check.upper() == 'Y':
-                    #     break
-                    # elif check.upper() == 'N':
-                    #     continue
-                    # else:
-                    #     print('\nInvalid input. Please try again.')      
-                    #     continue   
                 elif result == 'False':
                     print('\nPart does not exist.')
                     continue
@@ -241,96 +236,111 @@ def findPartsByPN (p_number) : # finding parts by part number. Function with inp
     
 def updateParts(): # update parts attributes
     while True:
-        print('Update part attributes')
+        print('\nUpdate part attributes')
         print('1. Update parts') 
         print('2. Return to main menu')
         try:
             choice = int(input('Enter desired menu [1-2]: '))
             if choice == 1 :
-                displayInventory() #for referencing to update
+                displayInventory() # for referencing to update
                 p_number = int(input('Enter part number: '))
                 result = findPartsByPN(p_number)
-                int_check = isinstance(result,int) #check if index return is integer. isinstance(a,b) a is variable, b can be int,float,string,etc
+                int_check = isinstance(result,int) # check if index return is integer. isinstance(a,b) a is variable, b can be int,float,string,etc
                 if int_check == True:
                     print('\nPart exists!\n')
                     tables = PrettyTable()
                     tables.field_names = ['Part Number','Name','Brand','Compatibility', 'Quantity','Price']
                     tables.add_row([parts_stock[result]['manufacturer_pn'],parts_stock[result]['part_name'],parts_stock[result]['manufacturer_brand'],parts_stock[result]['part_compatibility'],
-                                    parts_stock[result]['stock_quantity'],parts_stock[result]['price']]) #inserting list items into pretty table
-                    tables.align = 'c' #align center
+                                    parts_stock[result]['stock_quantity'],parts_stock[result]['price']]) # inserting list items into pretty table
+                    tables.align = 'c' # align center
                     print(tables)
                     edit_table = input('Which table would you like to edit?: ')
                     if edit_table.title() == 'Part Number': 
                         print('\nPart number cannot be changed. Please delete part and create a new entry with the new part number.\n') #unique, use delete and create new entry
                         continue
                     elif edit_table.title() == 'Name':
-                        new_name = input('Enter new name for this part: ')
-                        confirmation = input('Confirm changes?(Y/N): ')
-                        if confirmation.upper() == 'Y':
-                            parts_stock[result]['part_name'] = new_name
-                            print('Name successfully updated')
-                            break
-                        elif confirmation.upper() == 'N':
-                            break
-                        else:
-                            print('Invalid input')
-                            break
+                        while True:
+                            new_name = input('Enter new name for this part: ')
+                            if isinstance(new_name,str) == False:
+                                print('Please enter a string.')
+                                continue
+                            else:
+                                confirmation = input('Confirm changes?(Y/N): ')
+                                if confirmation.upper() == 'Y':
+                                    break
+                                elif confirmation.upper() == 'N':
+                                    continue
+                        parts_stock[result]['part_name'] = new_name
+                        print('Name successfully updated')
+                        continue                        
                     elif edit_table.title() == 'Brand':
-                        new_brand = input('Enter new brand for this part: ')
-                        confirmation = input('Confirm changes?(Y/N): ')
-                        if confirmation.upper() == 'Y':
-                            parts_stock[result]['manufacturer_brand'] = new_brand
-                            print('Brand successfully updated')
-                            break
-                        elif confirmation.upper() == 'N':
-                            break
-                        else:
-                            print('Invalid input')
-                            break
-                        
+                        while True:
+                            new_brand = input('Enter new brand for this part: ')
+                            if isinstance(new_brand,str) == False:
+                                print('Please enter a string.')
+                                continue
+                            else:
+                                confirmation = input('Confirm changes?(Y/N): ')
+                                if confirmation.upper() == 'Y':
+                                    break
+                                elif confirmation.upper() == 'N':
+                                    continue
+                        parts_stock[result]['manufacturer_brand'] = new_brand
+                        print('Brand successfully updated')
+                        continue                        
                     elif edit_table.title() == 'Compatibility':
-                        new_compatibility = input('Enter part compatibility for this part: ')
-                        confirmation = input('Confirm changes?(Y/N): ')
-                        if confirmation.upper() == 'Y':
-                            parts_stock[result]['part_compatibility'] = new_compatibility
-                            print('Part compatibility successfully updated')
-                            break
-                        elif confirmation.upper() == 'N':
-                            break
-                        else:
-                            print('Invalid input')
-                            break
-                       
+                         while True:
+                            new_compatibility = input('Enter new compatibility for this part: ')
+                            if isinstance(new_compatibility,str) == False:
+                                print('Please enter a string.')
+                                continue
+                            else:
+                                confirmation = input('Confirm changes?(Y/N): ')
+                                if confirmation.upper() == 'Y':
+                                    break
+                                elif confirmation.upper() == 'N':
+                                    continue
+                         parts_stock[result]['part_compatibility'] = new_compatibility
+                         print('Part compatibility successfully updated')
+                         continue
+                        
                     elif edit_table.title() == 'Quantity':
-                        new_quantity = input('Enter new quantity for this part: ')
-                        if new_quantity < 0:
-                            print('\nQuantity cannot be zero. Please try again\n')
-                            break
-                        confirmation = input('Confirm changes?(Y/N): ')
-                        if confirmation.upper() == 'Y':
-                            parts_stock[result]['stock_quantity'] = new_quantity
-                            print('Part compatibility successfully updated')
-                            break
-                        elif confirmation.upper() == 'N':
-                            break
-                        else:
-                            print('Invalid input')
-                            break
+                        while True:
+                            new_quantity = int(input('Enter new quantity for this part: '))
+                            if new_quantity <= 0:
+                                print('\nQuantity cannot be zero. Please try again\n')
+                                continue
+                            elif isinstance(new_quantity,int) == False:
+                                print('Please enter an integer.')
+                                continue
+                            else:
+                                confirmation = input('Confirm changes?(Y/N): ')
+                                if confirmation.upper() == 'Y':
+                                    break
+                                elif confirmation.upper() == 'N':
+                                    continue
+                        parts_stock[result]['stock_quantity'] = new_quantity
+                        print('Quantity successfully updated')
+                        continue
+
                     elif edit_table.title() == 'Price':
-                        new_price = int(input('Enter new price for this part (in $): '))
-                        if new_price < 0:
-                            print('\nPrice cannot be zero. Please try again\n')
-                            break
-                        confirmation = input('Confirm changes?(Y/N): ')
-                        if confirmation.upper() == 'Y':
-                            parts_stock[result]['price'] = new_price
-                            print('Price successfully updated')
-                            break
-                        elif confirmation.upper() == 'N':
-                            break
-                        else:
-                            print('Invalid input')
-                            break
+                        while True:
+                            new_price = float(input('Enter new price for this part (in $): '))
+                            if new_price <= 0:
+                                print('\nPrice cannot be zero. Please try again\n')
+                                continue
+                            elif isinstance(new_price,float) == False:
+                                print('Please enter an integer.')
+                                continue
+                            else:
+                                confirmation = input('Confirm changes?(Y/N): ')
+                                if confirmation.upper() == 'Y':
+                                    break
+                                elif confirmation.upper() == 'N':
+                                    continue
+                        parts_stock[result]['price'] = new_price
+                        print('Price successfully updated')
+                        continue
                         
                     else:
                         print('Invalid input.')
