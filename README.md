@@ -1,4 +1,4 @@
-# Simple CRUD program for an automotive parts store
+# Simple CRUD program for an Automotive Parts Store
 ## CRUD is short for Create, Read, Update, and Delete. It can be found in many different bussiness applications and is essential to many. 
 ## Context: Small to medium spareparts shop, used for parts purchasing (operated by Cashier) or inventory management (operated by Stockist)
 ## Part attributes:
